@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import model.Funcionario;
 import model.OrdemServico;
 import model.Pedido;
+import model.Servico;
 import model.ServicoOs;
 
 /**
@@ -89,7 +90,9 @@ public class OrdemServicoController {
 		services.BD b = new services.BD();
 		b.getConnection();
 		try {
-			String sql = "SELECT FUNCIONARIO FROM FUNCIONARIO";
+			String sql = "SELECT FUNCIONARIO FROM FUNCIONARIO "
+					+ "WHERE CARGO = (SELECT ID FROM CARGO WHERE CARGO LIKE 'PASSADEIRA') "
+					+ "OR CARGO = (SELECT ID FROM CARGO WHERE CARGO LIKE 'LAVADEIRA')";
 			b.st = b.con.createStatement();
 			b.rs = b.st.executeQuery(sql);
 			while (b.rs.next()) {
@@ -160,7 +163,7 @@ public class OrdemServicoController {
 				System.out.println("ERRO" + erro.toString());
 			}
 			try {
-				String sql = "SELECT TOP 1 ORDEM.ID FROM PEDIDO ORDER BY ID DESC";
+				String sql = "SELECT TOP 1 ORDEM.ID FROM ORDEM ORDER BY ID DESC";
 				b.st = b.con.createStatement();
 				b.rs = b.st.executeQuery(sql);
 				while (b.rs.next()) {
@@ -545,7 +548,7 @@ public class OrdemServicoController {
 		}
 	}
 	
-//	
+	
 //	public void editarOs() {
 //		int servico = Integer.parseInt(JOptionPane.showInputDialog("Codigo do servico a ser excluido:"));
 //		Servico s = new Servico();

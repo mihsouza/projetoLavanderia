@@ -34,7 +34,7 @@ public class TelaFuncionario extends JFrame {
 	private JTextField tfId;
 	private JTextField tfNome;
 	private JTextField tfCpf;
-	private JButton btSalvar, btCancelar, btVisualizar, btExcluir;
+	private JButton btSalvar, btCancelar, btVisualizar, btExcluir, btFinanceiro;
 	private JTextArea textAreaEndereco;
 	private JTextField tfTelefone;
 	private JLabel lblCep;
@@ -192,6 +192,12 @@ public class TelaFuncionario extends JFrame {
 		btExcluir.setBounds(224, 299, 89, 23);
 		contentPane.add(btExcluir);
 		
+		btFinanceiro = new JButton("Financeiro");
+		btFinanceiro.setForeground(Color.BLUE);
+		btFinanceiro.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btFinanceiro.setBounds(25, 299, 89, 23);
+		contentPane.add(btFinanceiro);
+		
 		controlarEventos();
 
 	}
@@ -237,6 +243,19 @@ public class TelaFuncionario extends JFrame {
 		btCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 					TelaFuncionario.this.setVisible(false);
+				}
+		});
+		
+		/**
+		 * Ações do botão Financeiro
+		 */
+		btFinanceiro.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					CadastrarSalarioFinanceiro frame = new CadastrarSalarioFinanceiro();
+					frame.setUndecorated(true);
+					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
+					frame.receberId(tfId.getText());
 				}
 		});
 	}
