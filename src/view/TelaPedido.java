@@ -11,6 +11,7 @@ import controller.PedidoController;
 import model.Cliente;
 import model.Pedido;
 import model.Servico;
+import services.GeneratorPDF;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -51,7 +52,7 @@ public class TelaPedido extends JFrame {
 	private JRadioButton rbEspera;
 	private JRadioButton rbFinalizado;
 	private JButton btVisualizar, btOrdem;
-	private JButton btExcluir;
+	private JButton btExcluir, btPdf;
 
 	/**
 	 * Executar a aplicação.
@@ -223,6 +224,12 @@ public class TelaPedido extends JFrame {
 		btOrdem.setBounds(408, 27, 89, 23);
 		contentPane.add(btOrdem);
 		
+		btPdf = new JButton("PDF");
+		btPdf.setForeground(Color.BLUE);
+		btPdf.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btPdf.setBounds(26, 352, 89, 23);
+		contentPane.add(btPdf);
+		
 		controlarEventos();
 
 	}
@@ -275,6 +282,7 @@ public class TelaPedido extends JFrame {
 					frame.setVisible(true);
 					frame.setLocationRelativeTo(null);
 					frame.receberPedido(tfId.getText());
+					TelaPedido.this.setVisible(false);
 				}
 		});
 		
@@ -284,6 +292,18 @@ public class TelaPedido extends JFrame {
 		btCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 					TelaPedido.this.setVisible(false);
+				}
+		});
+		
+		/**
+		 * Ações do botão PDF
+		 */
+		btPdf.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					GeneratorPDF g = new GeneratorPDF();
+					g.pdfPedido(tfId.getText(), cbCliente.getSelectedItem().toString(), 
+							tfDataEntrada.getText(), tfDataPrevista.getText(), cbAtendente.getSelectedItem().toString(), 
+							textAreaObs.getText());
 				}
 		});
 	}

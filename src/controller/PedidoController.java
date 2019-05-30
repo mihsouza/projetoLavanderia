@@ -411,4 +411,79 @@ public class PedidoController {
 			}
 		}
 	}
-}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * Receber pedido
+	 */
+
+	private JTextField tfStatus;
+	private JTextField tfPreco;
+	private JTextField tfPago;
+	private JTextField tfTroco;
+	private JTextField tfPedido;
+	
+	private JTextField tfCliente;
+	public PedidoController(JTextField tfCliente, JTextField tfStatus, JTextField tfPreco, JTextField tfPago,
+			JTextField tfTroco, JTextField tfPedido) {
+		super();
+		this.tfCliente = tfCliente;
+		this.tfStatus = tfStatus;
+		this.tfPreco = tfPreco;
+		this.tfPago = tfPago;
+		this.tfTroco = tfTroco;
+		this.tfPedido = tfPedido;
+	}
+	
+	public void atualizar() {
+		services.BD b = new services.BD();
+		int id = Integer.parseInt(tfPedido.getText());
+		if (b.getConnection()) {
+			try {
+				String sql = "SELECT C.CLIENTE, P.STATUS, P. PRECO "
+						+ "FROM PEDIDO P, CLIENTE C "
+						+ "WHERE P.CLIENTE = C.ID "
+						+ "AND P.ID = " + id;
+				b.st = b.con.createStatement();
+				b.rs = b.st.executeQuery(sql);
+				while (b.rs.next()) {
+					tfCliente.setText(b.rs.getString("CLIENTE"));
+					tfStatus.setText(b.rs.getString("STATUS"));
+					tfPreco.setText(String.valueOf(b.rs.getDouble("PRECO")));
+				}
+			} catch (Exception erro) {
+				System.out.println("ERRO" + erro.toString());
+			}
+		} else {
+			System.out.println("Falha na conexão");
+		}
+	}
+		
+		public void receber() {
+			services.BD b = new services.BD();
+			if (b.getConnection()) {
+				try {
+					String sql = "UPDATE PEDIDO SET STATUS = 'Finalizado', DATASAIDA = GETDATE() WHERE ID = " + tfPedido.getText();
+					b.st = b.con.createStatement();
+					b.st.executeUpdate(sql);
+					JOptionPane.showMessageDialog(null, "Recebido!");
+				} catch (Exception erro) {
+					System.out.println("ERRO" + erro.toString());
+				}
+			} else {
+				System.out.println("Falha na conexão");
+			}
+		}
+		
+		public void calcularTroco() {
+			float preco = Float.parseFloat(tfPreco.getText());
+			float pago = Float.parseFloat(tfPago.getText());
+			
+			float troco = pago - preco;
+			
+			tfTroco.setText(String.valueOf(troco));
+		}
+		
+	}
+	

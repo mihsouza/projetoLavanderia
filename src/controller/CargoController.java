@@ -68,7 +68,7 @@ public class CargoController extends BD {
 		c.setDescricao(textAreaDescricao.getText());
 		if (getConnection() == true) {
 			try {
-				String sql = "INSERT INTO CARGO VALUES ('" + c.getNome() + "', 0." + c.getRemuneracao() + ", '"
+				String sql = "INSERT INTO CARGO VALUES ('" + c.getNome() + "', " + c.getRemuneracao() + ", '"
 						+ c.getDescricao() + "')";
 				st = con.createStatement();
 				st.executeUpdate(sql);
@@ -133,7 +133,7 @@ public class CargoController extends BD {
 		c.setDescricao(textAreaDescricao.getText());
 		if (getConnection()) {
 			try {
-				String sql = "UPDATE CARGO SET CARGO = '" + c.getNome() + "', REMUNERACAO = 0." + c.getRemuneracao()
+				String sql = "UPDATE CARGO SET CARGO = '" + c.getNome() + "', REMUNERACAO = " + c.getRemuneracao()
 						+ ", DESCRICAO = '" + c.getDescricao() + "'" + "WHERE ID = " + c.getId();
 				st = con.createStatement();
 				st.executeUpdate(sql);

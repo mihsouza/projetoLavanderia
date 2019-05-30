@@ -97,11 +97,6 @@ public class TelaCargo extends JFrame {
 		contentPane.add(tfRemuneracao);
 		tfRemuneracao.setColumns(10);
 		
-		JLabel label = new JLabel("%");
-		label.setFont(new Font("Times New Roman", Font.BOLD, 13));
-		label.setBounds(191, 127, 82, 14);
-		contentPane.add(label);
-		
 		textAreaDescricao = new JTextArea();
 		textAreaDescricao.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 		textAreaDescricao.setBounds(101, 163, 396, 72);

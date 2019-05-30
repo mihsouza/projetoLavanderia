@@ -316,5 +316,120 @@ public class GeneratorPDF {
        document.close();
    }
 	
+	/**
+	 * Criar pdf para listar as contas filtradas
+	 */
+	
+	private JTextField tfPesquisa;
+	private JTextField tfInicio;
+	private JTextField tfFim;
+	private JRadioButton rbNaoPago, rbPago;
+
+	public GeneratorPDF(JRadioButton rbNaoPago, JRadioButton rbPago, JTextField tfPesquisa, JTextField tfInicio,
+			JTextField tfFim) {
+		this.rbNaoPago = rbNaoPago;
+		this.rbPago = rbPago;
+		this.tfPesquisa = tfPesquisa;
+		this.tfInicio = tfInicio;
+		this.tfFim = tfFim;
+	}
+	
+	public void pdfListaContas() {
+		String nome = JOptionPane.showInputDialog("Como gostaria de nomear este relatorio?");
+		// criação do documento
+	       Document document = new Document();
+	       try {
+	           
+	    	// Definindo uma fonte, com tamanho 20 e negrito e Sublinhado em baixo
+	           Font title = new Font(FontFamily.COURIER, 26, Font.BOLD+Font.ITALIC+Font.UNDERLINE);
+	           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\miche\\Downloads\\PDF\\Relatorio_" + nome + ".pdf"));
+	           document.open();
+	           document.setPageSize(PageSize.A4);
+	           
+	           Image figura = Image.getInstance("C:\\Users\\miche\\OneDrive\\Imagens\\Pi\\logotipo.PNG");
+	           figura.setAlignment(figura.ALIGN_CENTER);
+	           document.add(figura);
+	           
+	           
+	           // adicionando um parágrafo no documento
+	           Paragraph espaco = new Paragraph(" ");
+	           document.add(espaco);
+	           
+	           //Adicionando título
+	           Paragraph titulo = new Paragraph("Relatório - Contas a pagar", fontetitulo);
+	           titulo.setAlignment(titulo.ALIGN_CENTER);
+	           document.add(titulo);
+	           
+	           document.add(espaco);
+	           document.add(espaco);
+	           
+	           BD b = new BD();
+	           
+	           String sql = null;
+	   		if(rbNaoPago.isSelected() && rbPago.isSelected()) {
+	   			sql = "SELECT DATA, PAGOA, VALOR, STATUS "
+	   					+ "FROM HISTCONTAS WHERE DATA BETWEEN '" + tfInicio.getText() + "' AND '" + tfFim.getText() + "' "
+	   					+ "AND STATUS LIKE 'Pago' "
+	   					+ "OR STATUS LIKE 'Não Pago' "
+	   					+ "AND PAGOA LIKE '" + tfPesquisa.getText() + "%' ";
+	   		}else if(rbNaoPago.isSelected()) {
+	   			sql = "SELECT DATA, PAGOA, VALOR, STATUS "
+	   					+ "FROM HISTCONTAS WHERE DATA BETWEEN '" + tfInicio.getText() + "' AND '" + tfFim.getText() + "' "
+	   					+ "AND STATUS LIKE 'Não Pago' "
+	   					+ "AND PAGOA LIKE '" + tfPesquisa.getText() + "%' ";
+	   		}else {
+	   			sql = "SELECT DATA, PAGOA, VALOR, STATUS "
+	   					+ "FROM HISTCONTAS WHERE DATA BETWEEN '" + tfInicio.getText() + "' AND '" + tfFim.getText() + "' "
+	   					+ "AND STATUS LIKE 'Pago' "
+	   					+ "AND PAGOA LIKE '" + tfPesquisa.getText() + "%' ";
+	   		}
+	   		if (b.getConnection()) {
+	   			try {
+	   				b.st = b.con.createStatement();
+	   				b.rs = b.st.executeQuery(sql);
+					Paragraph cabecalho = new Paragraph("Data                   Valor                Status          Pago a", negrito);
+					document.add(cabecalho);
+						while (b.rs.next()) {
+							String status = null;
+							if(b.rs.getString("STATUS").equals("Pago")) {
+								status = b.rs.getString("STATUS") + "       ";
+							}else {
+								status = b.rs.getString("STATUS");
+							}
+							
+							double valor = b.rs.getDouble("Valor");
+							String preco = null;
+							if(valor > 0 && valor <= 9) {
+								preco = "     " + String.valueOf(valor);
+							}else if(valor >= 10 && valor <= 99) {
+								preco = "    " + String.valueOf(valor);
+							}else if(valor >= 101 && valor <= 999) {
+								preco = "  " + String.valueOf(valor);
+							}else{
+								preco = "" + String.valueOf(valor);
+							}
+								Paragraph lista = new Paragraph(b.rs.getString("DATA") + "             R$" 
+										+ preco + "0             "+ status + "        " 
+										+ b.rs.getString("PAGOA"), fontePadrao);
+											document.add(lista);
+								document.newPage();
+						}
+						
+				} catch (SQLException e) {
+					System.out.println("ERRO" + e.toString());
+				}
+
+			}	           
+			JOptionPane.showMessageDialog(null, "PDF gerado com sucesso", "MESSAGE", JOptionPane.INFORMATION_MESSAGE);
+	 }
+	       catch(DocumentException de) {
+	           System.err.println(de.getMessage());
+	       }
+	       catch(IOException ioe) {
+	           System.err.println(ioe.getMessage());
+	       }
+	       document.close();
+	}
+	
  }
 

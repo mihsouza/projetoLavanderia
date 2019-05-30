@@ -12,6 +12,7 @@ import model.Cliente;
 import model.OrdemServico;
 import model.Pedido;
 import model.Servico;
+import services.GeneratorPDF;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -40,7 +41,7 @@ public class TelaOrdemServico extends JFrame {
 	private JPanel contentPane;
 	private JTextField tfId;
 	private JTextField tfDataEntrada;
-	private JButton btSalvar, btCancelar, btServico, btVisualizar, btExcluir;
+	private JButton btSalvar, btCancelar, btServico, btVisualizar, btExcluir, btPdf;
 	private JTextArea textAreaObs;
 	private JTextField tfDataPrevista;
 	private JLabel lblDataExecut;
@@ -241,6 +242,12 @@ public class TelaOrdemServico extends JFrame {
 		btExcluir.setBounds(224, 384, 89, 23);
 		contentPane.add(btExcluir);
 		
+		btPdf = new JButton("PDF");
+		btPdf.setForeground(Color.BLUE);
+		btPdf.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		btPdf.setBounds(25, 384, 89, 23);
+		contentPane.add(btPdf);
+		
 		controlarEventos();
 	}
 
@@ -338,6 +345,17 @@ public class TelaOrdemServico extends JFrame {
 		btCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 					TelaOrdemServico.this.setVisible(false);
+				}
+		});
+		
+		/**
+		 * Ações do botão PDF
+		 */
+		btPdf.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					GeneratorPDF g = new GeneratorPDF();
+					g.pdfOs(tfId.getText(), tfCliente.getText(), tfDataEntrada.getText(), tfDataPrevista.getText(), cbFuncionario.getSelectedItem().toString(), 
+							textAreaObs.getText(), tfPedido.getText());
 				}
 		});
 	}
