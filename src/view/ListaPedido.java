@@ -1,251 +1,49 @@
 package view;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
-import java.awt.Font;
-
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import java.awt.SystemColor;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.SQLException;
-
-import javax.swing.JButton;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.SoftBevelBorder;
 import javax.swing.table.DefaultTableModel;
 
 import controller.PedidoController;
 
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.SwingConstants;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.ImageIcon;
-
 public class ListaPedido extends JFrame {
-	protected JTextField tfPesquisa;
-	private JLabel lblPesquisa, lblTitle, lblOrdenar, lblImagem;
+
+	protected JPanel contentPane;
+	protected JButton btVoltar, btBuscar, btNovo, btFiltrar, btPdf;
+	protected JPanel panel, plBotao;
+	protected JLabel lbTitulo, lbNome, lblOrdenar, lbAtributo, lbAtributo2, lbStatus, lbImagem;
+	protected JTextField tfNome, tfDe, tfAte;
 	protected JComboBox cbOrdenar;
-	private JButton btNovo, btFiltrar;
-	protected JRadioButton rbAtraso;
-	protected JRadioButton rbEspera;
-	protected JRadioButton rbFinalizado;
-	private JButton btVoltar;
-	private JScrollPane scrollPane;
 	private JTable table;
+	private JComboBox cbStatus;
 	DefaultTableModel modelo = new DefaultTableModel();
-	private JButton btVisualizar;
+	public JTextField tfUsuario;
 
 	/**
-	 * Create the panel.
+	 * Launch the application.
 	 */
-	public ListaPedido() {
-		setTitle("Pedidos");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaInicial.class.getResource("/view/icone_NB.png")));
-		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 600);
-		JPanel contentPane = new JPanel();
-		contentPane.setBackground(SystemColor.textHighlight);
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		setBackground(new Color(240, 255, 255));
-		getContentPane().setLayout(null);
-		contentPane.setLayout(null);
-		
-		lblPesquisa = new JLabel("Cliente:");
-		lblPesquisa.setForeground(Color.WHITE);
-		lblPesquisa.setBounds(20, 54, 71, 23);
-		lblPesquisa.setFont(new Font("Segoe UI", Font.BOLD, 20));
-		getContentPane().add(lblPesquisa);
-		
-		lblTitle = new JLabel("Pedidos");
-		lblTitle.setForeground(Color.WHITE);
-		lblTitle.setBounds(54, 11, 155, 32);
-		lblTitle.setFont(new Font("Dialog", Font.BOLD, 30));
-		getContentPane().add(lblTitle);
-		
-		lblOrdenar = new JLabel("Ordenar por:");
-		lblOrdenar.setForeground(Color.WHITE);
-		lblOrdenar.setBounds(20, 119, 125, 31);
-		lblOrdenar.setFont(new Font("Segoe UI", Font.BOLD, 20));
-		getContentPane().add(lblOrdenar);
-		
-		tfPesquisa = new JTextField();
-		tfPesquisa.setBounds(101, 56, 332, 23);
-		tfPesquisa.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		getContentPane().add(tfPesquisa);
-		tfPesquisa.setColumns(10);
-		
-		cbOrdenar = new JComboBox();
-		cbOrdenar.setBounds(155, 127, 170, 25);
-		cbOrdenar.setModel(new DefaultComboBoxModel(new String[] {"Cliente", "C\u00F3digo", "Status", "Pre\u00E7o"}));
-		cbOrdenar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		getContentPane().add(cbOrdenar);
-		
-		JPanel pnBotao = new JPanel();
-		pnBotao.setBounds(10, 161, 765, 58);
-		pnBotao.setBackground(Color.DARK_GRAY);
-		getContentPane().add(pnBotao);
-		pnBotao.setLayout(null);
-		
-		btFiltrar = new JButton("Filtrar");
-		btFiltrar.setForeground(SystemColor.inactiveCaptionBorder);
-		btFiltrar.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/filtrar.png")));
-		btFiltrar.setBackground(new Color(222, 184, 135));
-		btFiltrar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		btFiltrar.setBounds(10, 11, 120, 40);
-		pnBotao.add(btFiltrar);
-		
-		btNovo = new JButton("Novo");
-		btNovo.setForeground(SystemColor.inactiveCaptionBorder);
-		btNovo.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/novo.png")));
-		btNovo.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		btNovo.setBackground(new Color(222, 184, 135));
-		btNovo.setBounds(140, 11, 120, 40);
-		pnBotao.add(btNovo);
-		
-		btVisualizar = new JButton("Detalhes");
-		btVisualizar.setForeground(SystemColor.inactiveCaptionBorder);
-		btVisualizar.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/Visualizar.png")));
-		btVisualizar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		btVisualizar.setBackground(new Color(222, 184, 135));
-		btVisualizar.setBounds(270, 11, 132, 40);
-		pnBotao.add(btVisualizar);
-		
-		JLabel lblStatus = new JLabel("Status:");
-		lblStatus.setForeground(Color.WHITE);
-		lblStatus.setBounds(20, 88, 71, 23);
-		lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 20));
-		contentPane.add(lblStatus);
-		
-		rbFinalizado = new JRadioButton("Finalizado");
-		rbFinalizado.setFont(new Font("Tahoma", Font.BOLD, 11));
-		rbFinalizado.setForeground(Color.WHITE);
-		rbFinalizado.setBounds(111, 89, 109, 23);
-		rbFinalizado.setBackground(SystemColor.textHighlight);
-		contentPane.add(rbFinalizado);
-		
-		rbEspera = new JRadioButton("Em espera");
-		rbEspera.setSelected(true);
-		rbEspera.setFont(new Font("Tahoma", Font.BOLD, 11));
-		rbEspera.setForeground(Color.WHITE);
-		rbEspera.setBounds(222, 89, 109, 23);
-		rbEspera.setBackground(SystemColor.textHighlight);
-		contentPane.add(rbEspera);
-		
-		rbAtraso = new JRadioButton("Em atraso");
-		rbAtraso.setFont(new Font("Tahoma", Font.BOLD, 11));
-		rbAtraso.setForeground(Color.WHITE);
-		rbAtraso.setBounds(334, 89, 109, 23);
-		rbAtraso.setBackground(SystemColor.textHighlight);
-		contentPane.add(rbAtraso);
-		
-		/**
-		 * Para que o usuario não selecione dois rdbtn ao mesmo tempo
-		 */
-		ButtonGroup bg = new ButtonGroup();
-		bg.add(rbFinalizado);
-		bg.add(rbEspera);
-		bg.add(rbAtraso);
-		
-		btVoltar = new JButton("Voltar");
-		btVoltar.setForeground(Color.WHITE);
-		btVoltar.setBackground(new Color(0, 139, 139));
-		btVoltar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		btVoltar.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/voltar.png")));
-		btVoltar.setBounds(654, 15, 120, 40);
-		contentPane.add(btVoltar);
-		
-		scrollPane = new JScrollPane();
-		scrollPane.setViewportBorder(new LineBorder(new Color(224, 255, 255)));
-		scrollPane.setToolTipText("");
-		scrollPane.setBounds(10, 227, 764, 323);
-		getContentPane().add(scrollPane);
-		scrollPane.setBackground(new Color(224, 255, 255));
-		
-		lblImagem = new JLabel("");
-		lblImagem.setForeground(Color.WHITE);
-		lblImagem.setIcon(new ImageIcon(TelaPedido.class.getResource("/view/novo.png")));
-		lblImagem.setFont(new Font("Tahoma", Font.BOLD, 25));
-		lblImagem.setBounds(25, 11, 34, 40);
-		contentPane.add(lblImagem);
-		
-		table = new JTable(modelo);
-		scrollPane.setViewportView(table);
-		
-		modelo.addColumn("Código");
-		modelo.addColumn("Cliente");
-		modelo.addColumn("Atendente");
-		modelo.addColumn("Status");
-		modelo.addColumn("Total");
-		
-		controlarEventos();
-
-	}
-	
-	public void controlarEventos() {
-		
-		btNovo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TelaPedido frame = new TelaPedido();
-				frame.setUndecorated(true);
-				frame.setVisible(true);
-				frame.setLocationRelativeTo(null);
-			}
-
-		});
-		
-		btVisualizar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				TelaPedido frame = new TelaPedido();
-				frame.setUndecorated(true);
-				frame.setVisible(true);
-				frame.setLocationRelativeTo(null);
-				frame.contentPane.add(frame.btVisualizar);
-				frame.contentPane.add(frame.btExcluir);
-				frame.tfId.setEditable(true);
-				frame.lblTitulo.setText("Funcionario");
-			}
-		});
-		
-		btVoltar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ListaPedido.this.setVisible(false);
-				TelaMenu frame = new TelaMenu();
-				frame.setVisible(true);
-				frame.setLocationRelativeTo(null);
-			}
-		});
-		
-		btFiltrar.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				PedidoController p = new PedidoController(rbAtraso, rbEspera, rbFinalizado, tfPesquisa, cbOrdenar, modelo);
-				p.consulta();
-			}
-		});
-	}
-	
-
 //	public static void main(String[] args) {
 //		EventQueue.invokeLater(new Runnable() {
-//			/**
-//			 * método run - método que inicia a aplicação
-//			 */
 //			public void run() {
 //				try {
 //					ListaPedido frame = new ListaPedido();
@@ -257,4 +55,229 @@ public class ListaPedido extends JFrame {
 //			}
 //		});
 //	}
+
+	/**
+	 * Create the frame.
+	 */
+	public ListaPedido() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(50, 100, 1366, 745);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		
+		panel = new JPanel();
+		panel.setBackground(new Color(175, 238, 238));
+		contentPane.add(panel, BorderLayout.CENTER);
+		panel.setLayout(null);
+		
+		lbTitulo = new JLabel("Pedidos");
+		lbTitulo.setFont(new Font("Roboto Lt", Font.BOLD, 30));
+		lbTitulo.setBounds(177, 28, 297, 28);
+		panel.add(lbTitulo);
+		
+		btVoltar = new JButton("");
+		btVoltar.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/voltar.png")));
+		btVoltar.setFont(new Font("Segoe UI", Font.BOLD, 15));
+		btVoltar.setForeground(Color.WHITE);
+		btVoltar.setBackground(new Color(51, 51, 102));
+		btVoltar.setBounds(1258, 11, 58, 45);
+		btVoltar.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panel.add(btVoltar);
+		
+		lbImagem = new JLabel("New label");
+		lbImagem.setIcon(new ImageIcon(TelaSistema.class.getResource("/view/ordem_servico.png")));
+		lbImagem.setBackground(new Color(0, 102, 51));
+		lbImagem.setBounds(60, 4, 107, 89);
+		panel.add(lbImagem);
+		
+		/**
+		 * Fazer com q a imagem fique dentro do label
+		 */
+		ImageIcon novoCargo = new ImageIcon(TelaSistema.class.getResource("/view/ordem_servico.png"));
+		Image novoCa = novoCargo.getImage().getScaledInstance(lbImagem.getWidth(), lbImagem.getHeight(), Image.SCALE_SMOOTH);	
+		lbImagem.setIcon(new ImageIcon(novoCa));
+		
+		plBotao = new JPanel();
+		plBotao.setBackground(new Color(95, 158, 160));
+		plBotao.setBounds(10, 216, 1320, 62);
+		panel.add(plBotao);
+		plBotao.setLayout(null);
+		
+		btFiltrar = new JButton("Filtrar");
+		btFiltrar.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/filtrar.png")));
+		btFiltrar.setForeground(new Color(0, 0, 0));
+		btFiltrar.setBackground(new Color(255, 255, 255));
+		btFiltrar.setFont(new Font("Roboto", Font.BOLD, 18));
+		btFiltrar.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0), new Color(0, 0, 0)));
+		btFiltrar.setBounds(10, 11, 120, 40);
+		plBotao.add(btFiltrar);
+		
+		btBuscar = new JButton("Ver");
+		btBuscar.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/detalhes.png")));
+		btBuscar.setForeground(new Color(0, 128, 128));
+		btBuscar.setFont(new Font("Roboto", Font.BOLD, 18));
+		btBuscar.setBackground(Color.WHITE);
+		btBuscar.setBorder(new SoftBevelBorder(BevelBorder.RAISED, new Color(0, 128, 128), new Color(0, 128, 128), new Color(0, 128, 128), new Color(0, 128, 128)));
+		btBuscar.setBounds(150, 11, 120, 40);
+		plBotao.add(btBuscar);
+		
+		btNovo = new JButton("Novo");
+		btNovo.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/novo.png")));
+		btNovo.setForeground(new Color(0, 0, 128));
+		btNovo.setFont(new Font("Roboto", Font.BOLD, 18));
+		btNovo.setBackground(new Color(255, 255, 255));
+		btNovo.setBorder(new SoftBevelBorder(BevelBorder.RAISED, new Color(0, 0, 128), new Color(0, 0, 128), new Color(0, 0, 128), new Color(0, 0, 128)));
+		btNovo.setBounds(292, 11, 120, 40);
+		plBotao.add(btNovo);
+		
+//		btPdf = new JButton("PDF");
+//		btPdf.setIcon(new ImageIcon(ListaPedido.class.getResource("/view/PDF.png")));
+//		btPdf.setForeground(new Color(255, 0, 0));
+//		btPdf.setFont(new Font("Roboto", Font.BOLD, 18));
+//		btPdf.setBackground(new Color(255, 255, 255));
+//		btPdf.setBorder(new SoftBevelBorder(BevelBorder.RAISED, new Color(255, 0, 0), new Color(255, 0, 0), new Color(255, 0, 0), new Color(255, 0, 0)));
+//		btPdf.setBounds(433, 11, 120, 40);
+//		plBotao.add(btPdf);
+		
+		lbNome = new JLabel("Cliente:");
+		lbNome.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbNome.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbNome.getHorizontalAlignment();
+		lbNome.setBounds(10, 91, 141, 14);
+		panel.add(lbNome);
+		
+		lblOrdenar = new JLabel("Ordenar por:");
+		lblOrdenar.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblOrdenar.setFont(new Font("Roboto", Font.BOLD, 15));
+		lblOrdenar.setBounds(10, 177, 141, 14);
+		panel.add(lblOrdenar);
+		
+		lbAtributo = new JLabel("De:");
+		lbAtributo.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbAtributo.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbAtributo.setBounds(10, 129, 141, 14);
+		panel.add(lbAtributo);
+		
+		tfNome = new JTextField();
+		tfNome.setFont(new Font("Roboto", Font.PLAIN, 15));
+		tfNome.setBounds(164, 89, 443, 20);
+		panel.add(tfNome);
+		tfNome.setColumns(10);
+		
+		tfDe = new JTextField();
+		tfDe.setText("01/01/2019");
+		tfDe.setFont(new Font("Roboto", Font.PLAIN, 15));
+		tfDe.setColumns(10);
+		tfDe.setBounds(164, 127, 141, 20);
+		panel.add(tfDe);
+		
+		lbAtributo2 = new JLabel("At\u00E9:");
+		lbAtributo2.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbAtributo2.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbAtributo2.setBounds(315, 130, 141, 14);
+		panel.add(lbAtributo2);
+		
+		tfAte = new JTextField();
+		tfAte.setText("31/12/2019");
+		tfAte.setFont(new Font("Roboto", Font.PLAIN, 15));
+		tfAte.setColumns(10);
+		tfAte.setBounds(466, 127, 141, 20);
+		panel.add(tfAte);
+		
+		lbStatus = new JLabel("Status:");
+		lbStatus.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbStatus.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbStatus.setBounds(617, 92, 141, 14);
+		panel.add(lbStatus);
+		
+		cbOrdenar = new JComboBox();
+		cbOrdenar.setModel(new DefaultComboBoxModel(new String[] {"ID", "Data", "Status"}));
+		cbOrdenar.setFont(new Font("Roboto", Font.PLAIN, 15));
+		cbOrdenar.setBounds(164, 175, 203, 20);
+		panel.add(cbOrdenar);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 289, 1320, 396);
+		panel.add(scrollPane);
+		
+		cbStatus = new JComboBox();
+		cbStatus.setModel(new DefaultComboBoxModel(new String[] {"", "Fila", "Em execu\u00E7\u00E3o", "Pronto", "Entregue"}));
+		cbStatus.setFont(new Font("Roboto", Font.PLAIN, 15));
+		cbStatus.setBounds(710, 126, 203, 20);
+		panel.add(cbStatus);
+		
+		table = new JTable(modelo);
+		table.setFont(new Font("Roboto", Font.PLAIN, 15));
+		scrollPane.setViewportView(table);
+		
+		JLabel lblFuncionrio = new JLabel("Funcion\u00E1rio:");
+		lblFuncionrio.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblFuncionrio.setFont(new Font("Roboto", Font.BOLD, 15));
+		lblFuncionrio.setBounds(558, 177, 141, 14);
+		panel.add(lblFuncionrio);
+		
+		tfUsuario = new JTextField();
+		tfUsuario.setEditable(false);
+		tfUsuario.setFont(new Font("Roboto", Font.PLAIN, 15));
+		tfUsuario.setColumns(10);
+		tfUsuario.setBounds(710, 174, 443, 20);
+		panel.add(tfUsuario);
+		
+		modelo.addColumn("ID");
+		modelo.addColumn("Data de Entrada");
+		modelo.addColumn("Cliente");
+		modelo.addColumn("Responsável");
+		modelo.addColumn("Status");
+		modelo.addColumn("Observação");
+		
+		controlarEvento();
+	}
+	
+	public void controlarEvento() {
+		/**
+		 * Chamar uma tela para cadastrar
+		 */
+		btNovo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TelaPedido frame = new TelaPedido();
+				frame.setUndecorated(true);
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+			}
+
+		});
+		
+		/**
+		 * Chamar uma tela para visualizar
+		 */
+		btBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TelaPedido frame = new TelaPedido();
+				frame.setUndecorated(true);
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+				frame.panel.add(frame.btExcluir);
+				frame.panel.add(frame.btBuscar);
+				frame.lbTitulo.setText("Pedido");
+			}
+
+		});
+		
+		btFiltrar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PedidoController l = new PedidoController(cbStatus, tfNome, tfDe, tfAte, cbOrdenar, modelo, tfUsuario);
+				l.listar();
+			}
+		});
+		
+		btVoltar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ListaPedido.this.setVisible(false);
+			}
+		});
+	}
 }

@@ -28,20 +28,20 @@ public class BD {
 	private final String DRIVER = 
 			"com.microsoft.sqlserver.jdbc.SQLServerDriver";//aqui fica o caminho do driver
 	private final String DATABASE = 
-			"projetoLavanderia";
+			"lavanderiaFinal";
 	private final String URL = 
 			"jdbc:sqlserver://localhost:1433;databaseName=" + DATABASE;
 	
 	public boolean getConnection() {
 		try {
 			Class.forName(DRIVER);
-//			System.out.println("Sucesso");
+			//System.out.println("Sucesso");
 			try {
 				con = DriverManager.getConnection(URL, LOGIN, SENHA);
-//				System.out.println("Sucesso");
+				//System.out.println("Sucesso");
 				return true;
 			} catch (SQLException e) {
-				System.out.println("ERRO" + e.toString());
+				//System.out.println("ERRO" + e.toString());
 				return false;
 			}
 		}catch(ClassNotFoundException e) {

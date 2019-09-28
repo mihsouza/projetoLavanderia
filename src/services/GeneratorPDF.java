@@ -18,17 +18,16 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import view.TelaMensagem;
-import view.TelaMenu;
+import view.TelaMensagemPdf;
+import view.TelaSistema;
 
 public class GeneratorPDF {
 	
 	public void mensagem() {
-		TelaMensagem frame = new TelaMensagem();
+		TelaMensagemPdf frame = new TelaMensagemPdf();
 		frame.setUndecorated(true);
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
-		frame.lblAviso.setText("PDF gerado com sucesso!");
 	}
 	
 	public GeneratorPDF() {
@@ -57,11 +56,11 @@ public class GeneratorPDF {
     	// Definindo uma fonte, com tamanho 20 e negrito e Sublinhado em baixo
            Font title = new Font(FontFamily.COURIER, 26, Font.BOLD+Font.ITALIC+Font.UNDERLINE);
            
-           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\miche\\Downloads\\PDF\\PDF_Pedido_" + id + ".pdf"));
+           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\tatia\\Downloads\\PDF\\PDF_Pedido_" + id + ".pdf"));
            document.open();
            document.setPageSize(PageSize.LARGE_CROWN_QUARTO);
            
-           Image figura = Image.getInstance((TelaMenu.class.getResource("/view/logotipo.png")));
+           Image figura = Image.getInstance((TelaSistema.class.getResource("/view/logotipo.png")));
            figura.setAlignment(figura.ALIGN_CENTER);
            document.add(figura);
            
@@ -164,11 +163,11 @@ public class GeneratorPDF {
     	// Definindo uma fonte, com tamanho 20 e negrito e Sublinhado em baixo
            Font title = new Font(FontFamily.COURIER, 26, Font.BOLD+Font.ITALIC+Font.UNDERLINE);
            
-           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\miche\\Downloads\\PDF\\PDF_Os_" + id + ".pdf"));
+           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\tatia\\Downloads\\PDF\\PDF_Os_" + id + ".pdf"));
            document.open();
            document.setPageSize(PageSize.LARGE_CROWN_QUARTO);
            
-           Image figura = Image.getInstance((TelaMenu.class.getResource("/view/logotipo.png")));
+           Image figura = Image.getInstance((TelaSistema.class.getResource("/view/logotipo.png")));
            figura.setAlignment(figura.ALIGN_CENTER);
            document.add(figura);
            
@@ -353,11 +352,11 @@ public class GeneratorPDF {
 	           
 	    	// Definindo uma fonte, com tamanho 20 e negrito e Sublinhado em baixo
 	           Font title = new Font(FontFamily.COURIER, 26, Font.BOLD+Font.ITALIC+Font.UNDERLINE);
-	           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\miche\\Downloads\\PDF\\Relatorio_" + nome + ".pdf"));
+	           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\tatia\\Downloads\\PDF\\Relatorio_" + nome + ".pdf"));
 	           document.open();
 	           document.setPageSize(PageSize.A4);
 	           
-	           Image figura = Image.getInstance((TelaMenu.class.getResource("/view/logotipo.png")));
+	           Image figura = Image.getInstance((TelaSistema.class.getResource("/view/logotipo.png")));
 	           figura.setAlignment(figura.ALIGN_CENTER);
 	           document.add(figura);
 	           
@@ -451,13 +450,13 @@ public class GeneratorPDF {
 	           
 	    	// Definindo uma fonte, com tamanho 20 e negrito e Sublinhado em baixo
 	           Font title = new Font(FontFamily.COURIER, 26, Font.BOLD+Font.ITALIC+Font.UNDERLINE);
-	           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\miche\\Downloads\\PDF\\Relatorio_" + nome + ".pdf"));
+	           PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\Michele\\Downloads\\PDF\\Relatorio_" + nome + ".pdf"));
 	           document.open();
 	           document.setPageSize(PageSize.A4);
 	           
-	           Image figura = Image.getInstance((TelaMenu.class.getResource("/view/logotipo.png")));
-	           figura.setAlignment(figura.ALIGN_CENTER);
-	           document.add(figura);
+//	           Image figura = Image.getInstance((TelaSistema.class.getResource("/view/logotipo.png")));
+//	           figura.setAlignment(figura.ALIGN_CENTER);
+//	           document.add(figura);
 	           
 	           
 	           // adicionando um parágrafo no documento
@@ -473,16 +472,17 @@ public class GeneratorPDF {
 	           document.add(espaco);
 	           
 	           BD b = new BD();
-	           
-	           String sql = "select * from histCaixaDia where data between '" + dataInicio + "' and '" + dataFim + "'";
 	   		if (b.getConnection()) {
 	   			try {
+	   				String sql = "select * from histCaixaTotal where data between '" + dataInicio + "' and '" + dataFim + "'";
+	   				System.out.println(sql);
 	   				b.st = b.con.createStatement();
 	   				b.rs = b.st.executeQuery(sql);
-					Paragraph cabecalho = new Paragraph("Data                   Entrada                Saída          Lucro", negrito);
+					Paragraph cabecalho = new Paragraph("Data                   Entrada             Contas          Comissão          Lucro", negrito);
 					document.add(cabecalho);
 						while (b.rs.next()) {
-							double caixa = b.rs.getDouble("caixaTotal");
+							String data = (b.rs.getString("DATA") + "     ");
+							double caixa = b.rs.getDouble("VALORENTRADA");
 							String caixaTotal = null;
 							if(caixa > 0 && caixa <= 9) {
 								caixaTotal = "     " + String.valueOf(caixa);
@@ -494,7 +494,19 @@ public class GeneratorPDF {
 								caixaTotal = "" + String.valueOf(caixa);
 							}
 							
-							double saida = b.rs.getDouble("contaTotal");
+							double conta = b.rs.getDouble("VALORCONTA");
+							String contas = null;
+							if(conta > 0 && conta <= 9) {
+								contas = "     " + String.valueOf(conta);
+							}else if(conta >= 10 && conta <= 99) {
+								contas = "    " + String.valueOf(conta);
+							}else if(conta >= 101 && conta <= 999) {
+								contas = "  " + String.valueOf(conta);
+							}else{
+								contas = "" + String.valueOf(conta);
+							}
+							
+							double saida = b.rs.getDouble("VALORCOMISSAO");
 							String contaTotal = null;
 							if(saida > 0 && saida <= 9) {
 								contaTotal = "     " + String.valueOf(saida);
@@ -506,7 +518,7 @@ public class GeneratorPDF {
 								contaTotal = "" + String.valueOf(saida);
 							}
 							
-							double lucro = b.rs.getDouble("lucroTotal");
+							double lucro = b.rs.getDouble("LUCRO");
 							String lucroTotal = null;
 							if(lucro > 0 && lucro <= 9) {
 								lucroTotal = "     " + String.valueOf(saida);
@@ -519,7 +531,7 @@ public class GeneratorPDF {
 							}
 								Paragraph lista = new Paragraph(b.rs.getString("DATA") + "             R$" 
 										+ caixaTotal + "0             R$"+ contaTotal + "0          R$" 
-										+ lucroTotal + "0", fontePadrao);
+										+ saida + "0             R$" + lucro + "0", fontePadrao);
 											document.add(lista);
 						}
 						

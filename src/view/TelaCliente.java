@@ -1,55 +1,41 @@
 package view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import controller.ClienteController;
-import model.Cliente;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import java.awt.Color;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-import javax.swing.border.SoftBevelBorder;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import java.awt.SystemColor;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.SoftBevelBorder;
+
+import controller.ClienteController;
 
 public class TelaCliente extends JFrame {
 
 	protected JPanel contentPane;
-	protected JTextField tfId;
-	private JTextField tfNome;
-	private JTextField tfCpf;
-	private JTextArea textAreaEndereco;
+	protected JButton btVoltar, btBuscar, btSalvar, btExcluir;
+	protected JPanel panel;
+	protected JLabel lbTitulo, lbNome, lbEndereco, lbAtributo, lbImagem;
+	protected JTextField tfNome, tfCpf;
+	public JTextField tfId;
 	private JTextField tfTelefone;
-	private JLabel lblCep;
-	protected JLabel lblCidade, lblTitulo;
-	private JLabel lblEstado;
-	private JTextField tfCep;
-	private JTextField tfCidade;
-	private JComboBox cbEstado;
-	protected JButton btCancelar, btSalvar, btExcluir, btVisualizar;
+	private JTextArea taEndereco;
+	private JTextField textField;
 
 	/**
-	 * Iniciar a aplicação.
+	 * Launch the application.
 	 */
 //	public static void main(String[] args) {
 //		EventQueue.invokeLater(new Runnable() {
@@ -57,6 +43,7 @@ public class TelaCliente extends JFrame {
 //				try {
 //					TelaCliente frame = new TelaCliente();
 //					frame.setVisible(true);
+//					frame.setLocationRelativeTo(null);
 //				} catch (Exception e) {
 //					e.printStackTrace();
 //				}
@@ -65,220 +52,208 @@ public class TelaCliente extends JFrame {
 //	}
 
 	/**
-	 * Criando o frame.
+	 * Create the frame.
 	 */
 	public TelaCliente() {
-		
-		setTitle("Cliente");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(TelaInicial.class.getResource("/view/icone_NB.png")));
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 557, 460);
+		setBounds(50, 100, 637, 437);
 		contentPane = new JPanel();
-		contentPane.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		contentPane.setBackground(SystemColor.textHighlight);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		this.setResizable(false);
 		
-		JLabel lblNome = new JLabel("Nome* :");
-		lblNome.setForeground(Color.WHITE);
-		lblNome.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblNome.setBounds(52, 120, 60, 39);
-		contentPane.add(lblNome);
+		panel = new JPanel();
+		panel.setBackground(new Color(102, 205, 170));
+		contentPane.add(panel, BorderLayout.CENTER);
+		panel.setLayout(null);
 		
-		JLabel lblCpf = new JLabel("CPF* :");
-		lblCpf.setForeground(Color.WHITE);
-		lblCpf.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblCpf.setBounds(68, 159, 44, 39);
-		contentPane.add(lblCpf);
+		lbTitulo = new JLabel("Novo Cliente");
+		lbTitulo.setFont(new Font("Roboto Lt", Font.BOLD, 30));
+		lbTitulo.setBounds(127, 21, 297, 36);
+		panel.add(lbTitulo);
 		
-		JLabel lblDescricao = new JLabel("Endere\u00E7o :");
-		lblDescricao.setForeground(Color.WHITE);
-		lblDescricao.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblDescricao.setBounds(33, 209, 79, 21);
-		contentPane.add(lblDescricao);
+		btVoltar = new JButton("");
+		btVoltar.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/voltar.png")));
+		btVoltar.setFont(new Font("Segoe UI", Font.BOLD, 15));
+		btVoltar.setForeground(Color.WHITE);
+		btVoltar.setBackground(new Color(51, 51, 102));
+		btVoltar.setBounds(507, 4, 58, 45);
+		btVoltar.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panel.add(btVoltar);
 		
-		JLabel lblId = new JLabel("ID:");
-		lblId.setForeground(Color.WHITE);
-		lblId.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblId.setBounds(91, 90, 38, 29);
-		contentPane.add(lblId);
+		lbImagem = new JLabel("New label");
+		lbImagem.setIcon(new ImageIcon(TelaSistema.class.getResource("/view/clientes.png")));
+		lbImagem.setBackground(new Color(0, 102, 51));
+		lbImagem.setBounds(21, 11, 96, 92);
+		panel.add(lbImagem);
 		
-		tfId = new JTextField();
-		tfId.setEditable(false);
-		tfId.setBounds(127, 92, 55, 25);
-		contentPane.add(tfId);
-		tfId.setColumns(10);
+		/**
+		 * Fazer com q a imagem fique dentro do label
+		 */
+		ImageIcon novoCargo = new ImageIcon(TelaSistema.class.getResource("/view/clientes.png"));
+		Image novoCa = novoCargo.getImage().getScaledInstance(lbImagem.getWidth(), lbImagem.getHeight(), Image.SCALE_SMOOTH);	
+		lbImagem.setIcon(new ImageIcon(novoCa));
+		
+		lbNome = new JLabel("Nome*:");
+		lbNome.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbNome.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbNome.getHorizontalAlignment();
+		lbNome.setBounds(21, 147, 81, 14);
+		panel.add(lbNome);
+		
+		lbEndereco = new JLabel("Endere\u00E7o:");
+		lbEndereco.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbEndereco.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbEndereco.setBounds(21, 231, 81, 14);
+		panel.add(lbEndereco);
+		
+		lbAtributo = new JLabel("CPF:");
+		lbAtributo.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbAtributo.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbAtributo.setBounds(0, 186, 102, 14);
+		panel.add(lbAtributo);
 		
 		tfNome = new JTextField();
-		tfNome.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		tfNome.setForeground(new Color(0, 0, 0));
-		tfNome.setBounds(127, 130, 396, 25);
-		contentPane.add(tfNome);
+		tfNome.setFont(new Font("Roboto", Font.PLAIN, 15));
+		tfNome.setBounds(122, 144, 443, 20);
+		panel.add(tfNome);
 		tfNome.setColumns(10);
 		
 		tfCpf = new JTextField();
-		tfCpf.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		tfCpf.setBounds(127, 169, 139, 25);
-		contentPane.add(tfCpf);
+		tfCpf.setFont(new Font("Roboto", Font.PLAIN, 15));
 		tfCpf.setColumns(10);
-		
-		JLabel lblTelefone = new JLabel("Telefone* :");
-		lblTelefone.setForeground(Color.WHITE);
-		lblTelefone.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblTelefone.setBounds(318, 165, 79, 27);
-		contentPane.add(lblTelefone);
-		
-		textAreaEndereco = new JTextArea();
-		textAreaEndereco.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		textAreaEndereco.setBounds(127, 209, 396, 50);
-		contentPane.add(textAreaEndereco);
-		
-		tfTelefone = new JTextField();
-		tfTelefone.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		tfTelefone.setColumns(10);
-		tfTelefone.setBounds(407, 169, 116, 25);
-		contentPane.add(tfTelefone);
-		
-		lblCep = new JLabel("CEP :");
-		lblCep.setForeground(Color.WHITE);
-		lblCep.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblCep.setBounds(83, 268, 38, 29);
-		contentPane.add(lblCep);
-		
-		lblCidade = new JLabel("Cidade :");
-		lblCidade.setForeground(Color.WHITE);
-		lblCidade.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblCidade.setBounds(61, 304, 60, 25);
-		contentPane.add(lblCidade);
-		
-		lblEstado = new JLabel("Estado:");
-		lblEstado.setForeground(Color.WHITE);
-		lblEstado.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		lblEstado.setBounds(318, 263, 98, 39);
-		contentPane.add(lblEstado);
-		
-		cbEstado = new JComboBox();
-		cbEstado.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-		cbEstado.setModel(new DefaultComboBoxModel(new String[] {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA ", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"}));
-		cbEstado.setBounds(377, 272, 44, 25);
-		contentPane.add(cbEstado);
-		
-		tfCep = new JTextField();
-		tfCep.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		tfCep.setColumns(10);
-		tfCep.setBounds(127, 272, 98, 25);
-		contentPane.add(tfCep);
-		
-		tfCidade = new JTextField();
-		tfCidade.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		tfCidade.setColumns(10);
-		tfCidade.setBounds(127, 307, 150, 25);
-		contentPane.add(tfCidade);
-		
-		btCancelar = new JButton("Cancelar");
-		btCancelar.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/cancel-button-white.png")));
-		btCancelar.setForeground(Color.WHITE);
-		btCancelar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		btCancelar.setBackground(new Color(205, 92, 92));
-		btCancelar.setBounds(263, 367, 125, 40);
-		contentPane.add(btCancelar);
-		
-		btSalvar = new JButton("Salvar");
-		btSalvar.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/Salvar.png")));
-		btSalvar.setForeground(Color.WHITE);
-		btSalvar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-		btSalvar.setBackground(new Color(60, 179, 113));
-		btSalvar.setBounds(398, 367, 125, 40);
-		contentPane.add(btSalvar);
+		tfCpf.setBounds(122, 183, 154, 20);
+		panel.add(tfCpf);
 		
 		btExcluir = new JButton("Excluir");
-		btExcluir.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/Excluir.png")));
-		btExcluir.setForeground(Color.WHITE);
-		btExcluir.setFont(new Font("Times New Roman", Font.BOLD, 15));
-		btExcluir.setBackground(new Color(96, 204, 204));
-		btExcluir.setBounds(127, 369, 125, 38);
-//		contentPane.add(btExcluir);
+		btExcluir.setBounds(304, 305, 120, 40);
+//		panel.add(btExcluir);
+		btExcluir.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/lixeira.png")));
+		btExcluir.setForeground(new Color(178, 34, 34));
+		btExcluir.setFont(new Font("Roboto", Font.BOLD, 18));
+		btExcluir.setBackground(new Color(255, 255, 255));
+		btExcluir.setBorder(new SoftBevelBorder(BevelBorder.RAISED, new Color(178, 34, 34), new Color(178, 34, 34), new Color(178, 34, 34), new Color(178, 34, 34)));
 		
-		btVisualizar = new JButton("Buscar");
-		btVisualizar.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/Visualizar.png")));
-		btVisualizar.setForeground(Color.WHITE);
-		btVisualizar.setFont(new Font("Times New Roman", Font.BOLD, 15));
-		btVisualizar.setBackground(new Color(96, 204, 204));
-		btVisualizar.setBounds(214, 77, 135, 40);
-//		contentPane.add(btVisualizar);
+		btSalvar = new JButton("Salvar");
+		btSalvar.setBounds(445, 304, 120, 40);
+		panel.add(btSalvar);
+		btSalvar.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/salvar.png")));
+		btSalvar.setForeground(new Color(72, 61, 139));
+		btSalvar.setFont(new Font("Roboto", Font.BOLD, 18));
+		btSalvar.setBackground(new Color(255, 255, 255));
+		btSalvar.setBorder(new SoftBevelBorder(BevelBorder.RAISED, new Color(72, 61, 139), new Color(72, 61, 139), new Color(72, 61, 139), new Color(72, 61, 139)));
 		
-		lblTitulo = new JLabel("Novo cliente");
-		lblTitulo.setFont(new Font("Dialog", Font.BOLD, 20));
-		lblTitulo.setForeground(Color.WHITE);
-		lblTitulo.setBounds(127, 25, 171, 29);
-		contentPane.add(lblTitulo);
+		btBuscar = new JButton("Ver");
+		btBuscar.setBounds(342, 75, 120, 40);
+//		panel.add(btBuscar);
+		btBuscar.setIcon(new ImageIcon(TelaCliente.class.getResource("/view/Visualizar.png")));
+		btBuscar.setForeground(new Color(47, 79, 79));
+		btBuscar.setFont(new Font("Roboto", Font.BOLD, 18));
+		btBuscar.setBackground(Color.WHITE);
+		btBuscar.setBorder(new SoftBevelBorder(BevelBorder.RAISED, new Color(47, 79, 79), new Color(47, 79, 79), new Color(47, 79, 79), new Color(47, 79, 79)));
 		
-		JLabel lblImgCliente = new JLabel("");
-		lblImgCliente.setIcon(new ImageIcon(ListaCliente.class.getResource("/view/clientes.png")));
-		lblImgCliente.setForeground(Color.WHITE);
-		lblImgCliente.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 40));
-		lblImgCliente.setBounds(37, 11, 75, 55);
-		contentPane.add(lblImgCliente);
+		tfId = new JTextField();
+		tfId.setEditable(false);
+		tfId.setFont(new Font("Roboto", Font.PLAIN, 15));
+		tfId.setColumns(10);
+		tfId.setBounds(522, 86, 43, 20);
+		panel.add(tfId);
 		
-		ImageIcon Cliente = new ImageIcon(TelaCargo.class.getResource("/view/clientes.png"));
-		Image Cli = Cliente.getImage().getScaledInstance(lblImgCliente.getWidth(), lblImgCliente.getHeight(), Image.SCALE_SMOOTH);	
-		lblImgCliente.setIcon(new ImageIcon(Cli));
+		JLabel lblId = new JLabel("ID:");
+		lblId.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblId.setFont(new Font("Roboto", Font.BOLD, 15));
+		lblId.setBounds(487, 90, 25, 14);
+		panel.add(lblId);
 		
-		controlarEventos();
+		taEndereco = new JTextArea();
+		taEndereco.setFont(new Font("Roboto", Font.PLAIN, 15));
+		taEndereco.setLineWrap(true);
+		taEndereco.setBounds(122, 227, 287, 66);
+		panel.add(taEndereco);
+		
+		tfTelefone = new JTextField();
+		tfTelefone.setFont(new Font("Roboto", Font.PLAIN, 15));
+		tfTelefone.setColumns(10);
+		tfTelefone.setBounds(411, 184, 154, 20);
+		panel.add(tfTelefone);
+		
+		JLabel lbTelefone = new JLabel("Telefone:");
+		lbTelefone.setHorizontalAlignment(SwingConstants.RIGHT);
+		lbTelefone.setFont(new Font("Roboto", Font.BOLD, 15));
+		lbTelefone.setBounds(299, 187, 102, 14);
+		panel.add(lbTelefone);
+		
+		JLabel lblSaldo = new JLabel("Saldo:");
+		lblSaldo.setFont(new Font("Roboto", Font.BOLD, 15));
+		lblSaldo.setBounds(431, 232, 102, 14);
+		panel.add(lblSaldo);
+		
+		textField = new JTextField();
+		textField.setFont(new Font("Roboto", Font.PLAIN, 15));
+		textField.setColumns(10);
+		textField.setBounds(431, 257, 134, 20);
+		panel.add(textField);
+		
+		controlarEvento();
 	}
 	
-	public void controlarEventos() {
-		ClienteController c = new ClienteController(tfId, tfNome, tfCpf, textAreaEndereco, tfTelefone, tfCep, tfCidade, cbEstado);
+	public void controlarEvento() {
+		ClienteController c = new ClienteController(tfNome, tfTelefone, tfId, taEndereco, tfCpf);
 		/**
-		 * Ações do botão salvar
+		 * Fechar o frame
+		 */
+		btVoltar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TelaCliente.this.setVisible(false);
+			}
+
+		});
+		
+		/**
+		 * inserir um novo cargo
 		 */
 		btSalvar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean valido = c.validarCampo();
-				if(valido) {
-					c.verificarAcao();
+				if(c.validarCampo() == true) {
+					c.inserir();
 					TelaCliente.this.setVisible(false);
 				}
 			}
+
 		});
 		
 		/**
-		 * Ação do botão visualizar.
-		 */
-		btVisualizar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(tfId.getText() .trim().equals("")){
-					TelaMensagem frame = new TelaMensagem();
-					frame.setUndecorated(true);
-					frame.setVisible(true);
-					frame.setLocationRelativeTo(null);
-					frame.lblAviso.setText("O campo 'ID' não pode estar vazio!");
-				}else {
-					c.visualizar();
-				}	
-			}
-		});
-		
-		/**
-		 * Ação do botão excluir.
+		 * excluir um cargo
 		 */
 		btExcluir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(tfId.getText().trim().equals("")) {
+					TelaMensagemErro frame = new TelaMensagemErro();
+					frame.setUndecorated(true);
+					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
+					frame.lbCampo.setText("ID: Campo obrigatório");
+				}else {
 					c.excluir();
 					TelaCliente.this.setVisible(false);
 				}
+			}
+
 		});
 		
-		
-		/**
-		 * Ação do botão cancelar
-		 */
-		btCancelar.addActionListener(new ActionListener() {
+		btBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					TelaCliente.this.setVisible(false);
+				if(tfId.getText().trim().equals("")) {
+					TelaMensagemErro frame = new TelaMensagemErro();
+					frame.setUndecorated(true);
+					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
+					frame.lbCampo.setText("ID: Campo obrigatório");
+				}else {
+					c.visualizar();
 				}
+			}
+
 		});
 	}
 }

@@ -1,276 +1,217 @@
 package controller;
 
-import java.sql.SQLException;
-
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import model.Cargo;
-import model.Servico;
 import services.BD;
-import view.TelaMensagem;
+import view.TelaCargo;
+import view.TelaMensagemAviso;
+import view.TelaMensagemErro;
 
-/**
- * Classe de controle. Nela ficara os métodos para manipulação dos dados no
- * banco de dados. Teremos dois métodos construtores, pois a utilizaremos em
- * duas telas diferentes.
- * 
- * @author michele
- *
- */
 public class ServicoController extends BD {
 
-	/**
-	 * Atributos da classe TelaServico.
-	 */
+	protected JTextField tfNome, tfLavar, tfServico;
+	protected JComboBox cbTipo;
 	private JTextField tfId;
-	private JTextField tfNome;
-	private JComboBox cbTipo;
-	private JTextField tfPreco;
+	private JTextField tfPassar;
+	//public String id;
 
-	/**
-	 * Método pra instanciar os ojetos da classe TelaServico.
-	 * 
-	 * @param tfId    = id( não é editavel, pois o ususario não deve alterar o mesmo
-	 *                no banco).
-	 * @param tfNome  = nome do serviço.
-	 * @param tfPreco = preço atribuida ao serviço.
-	 * @param cbTipo
-	 */
-	public ServicoController(JTextField tfId, JTextField tfNome, JTextField tfPreco, JComboBox cbTipo) {
+	
+
+	public ServicoController(JTextField tfServico, JTextField tfLavar, JComboBox cbTipo, JTextField tfId,
+			JTextField tfPassar) {
+		this.tfServico = tfServico;
+		this.tfLavar = tfLavar;
 		this.cbTipo = cbTipo;
 		this.tfId = tfId;
-		this.tfNome = tfNome;
-		this.tfPreco = tfPreco;
+		this.tfPassar = tfPassar;
 	}
 
-	/**
-	 * Método para validar campo obrigatório
-	 * 
-	 * @return
-	 */
 	public boolean validarCampo() {
-		boolean valido = true;
-		if (tfPreco.getText().trim().equals("")) {
-			TelaMensagem frame = new TelaMensagem();
+		double lavar = 0;
+		double passar = 0;
+		try {
+			lavar = Double.parseDouble(tfLavar.getText());
+			passar = Double.parseDouble(tfPassar.getText());
+		} catch (NumberFormatException erro) {
+			TelaMensagemErro frame = new TelaMensagemErro();
 			frame.setUndecorated(true);
 			frame.setVisible(true);
 			frame.setLocationRelativeTo(null);
-			frame.lblAviso.setText("O campo 'Remuneração' não pode estar vazio!");
+			frame.lbCampo.setText("Preço deve ser numérico (Ex.: 3.10)");
+		}
+		boolean valido = true;
+		if (lavar <= 0 && passar <=0 && tfServico.getText().trim().equals("")) {
+			TelaMensagemErro frame = new TelaMensagemErro();
+			frame.setUndecorated(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			frame.lbCampo.setText("Preencha os campos obrigatórios");
+			valido = false;
+		} else if (lavar <= 0 && passar <=0) {
+			TelaMensagemErro frame = new TelaMensagemErro();
+			frame.setUndecorated(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			frame.lbCampo.setText("Atribua ao menos um valor para o serviço");
+			valido = false;
+		} else if (tfServico.getText().trim().equals("")) {
+			TelaMensagemErro frame = new TelaMensagemErro();
+			frame.setUndecorated(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			frame.lbCampo.setText("Serviço: campo obrigatório");
 			valido = false;
 		}
 		return valido;
 	}
 
-	/**
-	 * Inserir um novo registro
-	 */
 	public void inserir() {
-		Servico s = new Servico();
-		s.setNome(tfNome.getText());
-		s.setTipo(cbTipo.getSelectedItem().toString());
-		s.setPreco(Double.parseDouble(tfPreco.getText()));
-		if (getConnection()) {
-			try {
-				String sql = "INSERT INTO SERVICO VALUES ('" + s.getNome() + "', '" + s.getTipo() + "', " + s.getPreco()
-						+ ")";
-				st = con.createStatement();
-				st.executeUpdate(sql);
-			} catch (Exception erro) {
-				System.out.println("ERRO" + erro.toString());
-			}
-			/**
-			 * Preencher com o id que foi gerado no banco.
-			 */
-			try {
-				String sql = "SELECT TOP 1 SERVICO.ID FROM SERVICO ORDER BY ID DESC";
-				st = con.createStatement();
-				rs = st.executeQuery(sql);
-				while (rs.next()) {
-					tfId.setText(String.valueOf(rs.getInt("ID")));
-					TelaMensagem frame = new TelaMensagem();
-					frame.setUndecorated(true);
-					frame.setVisible(true);
-					frame.setLocationRelativeTo(null);
-					frame.lblAviso.setText("Salvo!");
+			if (getConnection() == true) {
+				try {
+					String sql = "EXEC SERVICOINSERIR null , '" + tfServico.getText() + "', '"
+							+ cbTipo.getSelectedItem() + "', " + tfLavar.getText() + ", " + tfPassar.getText();
+					System.out.println(sql);
+					st = con.createStatement();
+					st.executeUpdate(sql);
+				} catch (Exception erro) {
+					JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
 				}
-			} catch (Exception erro) {
-				System.out.println("ERRO" + erro.toString());
-			}
-		} else {
-			System.out.println("Falha na conexão");
-		}
-	}
-
-	/**
-	 * Pemite ao usuario visualizar o servico escolhido.
-	 */
-	public void visualizar() {
-		if (getConnection()) {
-			try {
-				String sql = "SELECT SERVICO, TIPO, PRECO FROM SERVICO WHERE ID = " + tfId.getText();
-				st = con.createStatement();
-				rs = st.executeQuery(sql);
-				while (rs.next()) {
-					tfNome.setText(rs.getString("SERVICO"));
-					cbTipo.setSelectedItem(rs.getString("TIPO"));// VERIFICAR
-					tfPreco.setText(String.valueOf(rs.getDouble("PRECO")));
+//				/**
+//				 * Preencher com o id que foi gerado no banco.
+//				 */
+				if (tfId.getText().trim().equals("")) {
+					try {
+						String sql = "SELECT TOP 1 SERVICO.ID FROM SERVICO ORDER BY ID DESC";
+						st = con.createStatement();
+						rs = st.executeQuery(sql);
+						while (rs.next()) {
+							tfId.setText(String.valueOf(rs.getInt("ID")));
+						}
+					} catch (Exception erro) {
+						JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
+					}
 				}
-			} catch (Exception erro) {
-				System.out.println("ERRO" + erro.toString());
-			}
-		} else {
-			System.out.println("Falha na conexão");
-		}
-	}
-
-	/**
-	 * Permite ao usuario editar os dados de um serviço.
-	 */
-	public void editar() {
-		Servico s = new Servico();
-		try {
-			s.setId(Integer.parseInt(tfId.getText()));
-		} catch (NumberFormatException erro) {
-			JOptionPane.showMessageDialog(null, "Id deve ser numérico", "ERROR", JOptionPane.ERROR_MESSAGE);
-		}
-		s.setNome(tfNome.getText());
-		s.setTipo(cbTipo.getSelectedItem().toString());
-		try {
-			s.setPreco(Double.parseDouble(tfPreco.getText()));
-		} catch (NumberFormatException erro) {
-			JOptionPane.showMessageDialog(null, "Preço deve ser numerico com duas casas decimai\n Exemplo: 2.10",
-					"ERROR", JOptionPane.ERROR_MESSAGE);
-		}
-		if (getConnection()) {
-			try {
-				String sql = "UPDATE SERVICO SET SERVICO = '" + s.getNome() + "', TIPO = '" + s.getTipo() + "', PRECO = "
-						+ s.getPreco() + "" + "WHERE ID = " + s.getId();
-				st = con.createStatement();
-				st.executeUpdate(sql);
-				TelaMensagem frame = new TelaMensagem();
+				TelaMensagemAviso frame = new TelaMensagemAviso();
 				frame.setUndecorated(true);
 				frame.setVisible(true);
 				frame.setLocationRelativeTo(null);
-				frame.lblAviso.setText("Salvo!");
-			} catch (Exception erro) {
-				System.out.println("ERRO" + erro.toString());
+			} else {
+				JOptionPane.showMessageDialog(null, "Falha na conexão");
 			}
-		} else {
-			System.out.println("Falha na conexão");
-		}
 	}
-
-	/**
-	 * Verifca se a ação do botão salvar será de inserir um novo registro ou de
-	 * alterar um existente.
-	 */
-	public void verificarAcao() {
-		Servico s = new Servico();
-		if (tfId.getText().trim().equals("")) {
-			inserir();
-		} else if (getConnection()) {
+	
+	public void alterar() {
+		if (getConnection() == true) {
 			try {
-				s.setId(Integer.parseInt(tfId.getText()));
-				String sql = "SELECT ID FROM SERVICO WHERE ID = " + s.getId();
-				st = con.createStatement();
-				rs = st.executeQuery(sql);
-				if (rs.next()) {
-					editar();
-				} else {
-					inserir();
-				}
-			} catch (Exception erro) {
-				System.out.println("ERRO" + erro.toString());
-			}
-		} else {
-			System.out.println("Falha na conexão");
-		}
-	}
-
-	/**
-	 * Excluir um registro do banco.
-	 */
-	public void excluir() {
-		Servico s = new Servico();
-		try {
-			s.setId(Integer.parseInt(tfId.getText()));
-		} catch (NumberFormatException erro) {
-			JOptionPane.showMessageDialog(null, "Id deve ser numérico", "ERROR", JOptionPane.ERROR_MESSAGE);
-		}
-		if (getConnection()) {
-			String sql = "DELETE FROM SERVICO WHERE ID = " + s.getId();
-			try {
+				String sql = "EXEC SERVICOINSERIR " + tfId.getText() + ", '" + tfServico.getText() + "', '"
+							+ cbTipo.getSelectedItem() + "', " + tfLavar.getText() + ", " + tfPassar.getText();
+				System.out.println(sql);
 				st = con.createStatement();
 				st.executeUpdate(sql);
-				TelaMensagem frame = new TelaMensagem();
+			} catch (Exception erro) {
+				JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
+			}
+//			/**
+//			 * Preencher com o id que foi gerado no banco.
+//			 */
+//			if (tfId.getText().trim().equals("")) {
+//				try {
+//					String sql = "SELECT TOP 1 CARGO.ID FROM CARGO ORDER BY ID DESC";
+//					st = con.createStatement();
+//					rs = st.executeQuery(sql);
+//					while (rs.next()) {
+//						tfId.setText(String.valueOf(rs.getInt("ID")));
+//					}
+//				} catch (Exception erro) {
+//					JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
+//				}
+//			}
+			TelaMensagemAviso frame = new TelaMensagemAviso();
+			frame.setUndecorated(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+		} else {
+			JOptionPane.showMessageDialog(null, "Falha na conexão");
+		}
+}
+	
+	public ServicoController() {
+	}
+	
+	public void excluir(String id) {
+		if (getConnection() == true) {
+			try {
+				String sql = "DELETE FROM SERVICO WHERE ID = " + id;
+				st = con.createStatement();
+				st.executeUpdate(sql);
+				TelaMensagemAviso frame = new TelaMensagemAviso();
 				frame.setUndecorated(true);
 				frame.setVisible(true);
 				frame.setLocationRelativeTo(null);
-				frame.lblAviso.setText("Excluído!");
+				frame.lbTitulo.setText("Excluído!");
 			} catch (Exception erro) {
-				System.out.println("ERRO" + erro.toString());
+				JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
 			}
 		} else {
-			System.out.println("Falha na conexão");
+			JOptionPane.showMessageDialog(null, "Falha na conexão");
 		}
 	}
+	
 
-	/**
-	 * atributos da tela ListaServico.
+	public void visualizar(String id) {
+		System.out.println("Metodo" + id);
+		if (getConnection() == true) {
+			try {
+				String sql = "SELECT * FROM SERVICO WHERE ID = " + id;
+				System.out.println(sql);
+				st = con.createStatement();
+				rs = st.executeQuery(sql);
+				while (rs.next()) {
+					tfServico.setText(rs.getString("SERVICO"));
+					cbTipo.setSelectedItem(rs.getString("TIPO"));
+					tfLavar.setText(String.valueOf(rs.getDouble("LAVAR")));
+					tfPassar.setText(String.valueOf(rs.getDouble("PASSAR")));
+				}
+			} catch (Exception erro) {
+				JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Falha na conexão");
+		}
+	}
+	
+	/*
+	 * Listar os cargos
 	 */
-	private JTextField tfPesquisa;
-	private JComboBox cbOrdenar;
+	
+	protected JComboBox cbOrdenar;
 	DefaultTableModel modelo = new DefaultTableModel();
 
-	/**
-	 * Método construtor para a classe ListaCargo
-	 * 
-	 * @param tfPesquisa
-	 * @param cbOrdenar
-	 */
-	public ServicoController(JTextField tfPesquisa, JComboBox cbOrdenar, DefaultTableModel modelo) {
-		this.tfPesquisa = tfPesquisa;
+	public ServicoController(JTextField tfNome, JComboBox cbOrdenar, DefaultTableModel modelo) {
+		this.tfNome = tfNome;
 		this.cbOrdenar = cbOrdenar;
 		this.modelo = modelo;
 	}
-
-	/**
-	 * Método para listar o cargo de acordo com os filtros e ordenação.
-	 */
-	public void consulta() {
-		String consulta = null;
-		String ordenacao = null;
-		/**
-		 * Definir a ordenacao da listagem.
-		 */
-		if (cbOrdenar.getSelectedItem().toString() == "Nome") {
-			ordenacao = "SERVICO";
-		} else if (cbOrdenar.getSelectedItem().toString() == "Código") {
-			ordenacao = "ID";
-		} else if (cbOrdenar.getSelectedItem().toString() == "Tipo") {
-			ordenacao = "TIPO";
-		} else {
-			ordenacao = "PRECO";
-		}
-
-		/**
-		 * Realizar a consulta no banco.
-		 */
-		if (getConnection()) {
+	
+	public void listar() {
+		if (getConnection() == true) {
 			try {
-				String sql = "SELECT * FROM SERVICO WHERE SERVICO LIKE '" + tfPesquisa.getText() + "%' ORDER BY " + ordenacao;
+				String sql = "SELECT * FROM SERVICO WHERE SERVICO LIKE '" + tfNome.getText() + "%' ORDER BY " + cbOrdenar.getSelectedItem();
 				st = con.createStatement();
 				rs = st.executeQuery(sql);
 				while (modelo.getRowCount()>0) modelo.removeRow(0);
 				while (rs.next()) {
-					modelo.addRow(new Object[] {rs.getInt("ID"), rs.getString("SERVICO"), "R$ " + rs.getDouble("PRECO") + "0", rs.getString("TIPO")});
+					modelo.addRow(new Object[] {rs.getInt("ID"), rs.getString("SERVICO"), rs.getString("TIPO")});
 				}
-			} catch (SQLException e) {
-				System.out.println("ERRO" + e.toString());
+			} catch (Exception erro) {
+				JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
 			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Falha na conexão");
 		}
 	}
 

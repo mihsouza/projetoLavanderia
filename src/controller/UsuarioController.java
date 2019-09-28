@@ -1,149 +1,176 @@
 package controller;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
-import model.Usuario;
 import services.BD;
-import view.TelaCadastro;
-import view.TelaMenu;
+import view.TelaCadastrar;
+import view.TelaCargo;
+import view.TelaConta;
+import view.TelaMensagemAviso;
+import view.TelaMensagemErro;
+import view.TelaSistema;
 
-/**
- * Classe de controle. Nela ficara os métodos para manipulação dos dados no
- * banco de dados. Teremos dois métodos construtores, pois a utilizaremos em
- * duas telas diferentes.
- * 
- * @author michele
- *
- */
-public class UsuarioController {
+public class UsuarioController extends BD {
 
-	/**
-	 * Propriedades do cadastro de usuarios
-	 */
 	private JTextField tfUsuario;
 	private JTextField tfSenha;
-	private JTextField tfConfirmar;
-	private JLabel lblConfirmarSenhaImg;
+	private JTextField tfCadastrar;
+	public JComboBox cbPermissao;
+	public String permissao;
 
-	/**
-	 * Método para a TelaCadastro
-	 * 
-	 * @param tfUsuario
-	 * @param tfSenha
-	 * @param tfConfirmar
-	 */
-	public UsuarioController(JTextField tfUsuario, JTextField tfSenha, JTextField tfConfirmar, JLabel lblConfirmarSenhaImg) {
+	public UsuarioController(JTextField tfUsuario, JTextField tfSenha, JTextField tfCadastrar, JComboBox cbPermissao) {
 		super();
 		this.tfUsuario = tfUsuario;
 		this.tfSenha = tfSenha;
-		this.tfConfirmar = tfConfirmar;
-		this.lblConfirmarSenhaImg = lblConfirmarSenhaImg;
+		this.tfCadastrar = tfCadastrar;
+		this.cbPermissao = cbPermissao;
 	}
 
-	BD b = new BD();
-
-	/**
-	 * Validar campos obrigatorios
-	 * 
-	 * @return
-	 */
 	public boolean validarCampo() {
-		if (tfUsuario.getText().trim().equals("")) {
-			JOptionPane.showMessageDialog(null, "O campo 'Usuario' não pode estar vazio", "ERROR",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		} else if (tfSenha.getText().trim().equals("")) {
-			JOptionPane.showMessageDialog(null, "O campo 'Senha' não pode estar vazio", "ERROR",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		} else if (tfConfirmar.getText().trim().equals("")) {
-			JOptionPane.showMessageDialog(null, "O campo 'Confirmar' não pode estar vazio", "ERROR",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
+		boolean valido = true;
+		if (tfUsuario.getText().trim().equals("") && tfSenha.getText().trim().equals("")
+				&& tfCadastrar.getText().trim().equals("")) {
+			TelaMensagemErro frame = new TelaMensagemErro();
+			frame.setUndecorated(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			frame.lbCampo.setText("Preencha os campos obrigatórios!");
+			valido = false;
+		} else if (tfUsuario.getText().trim().equals("")) {
+			TelaMensagemErro frame = new TelaMensagemErro();
+			frame.setUndecorated(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			frame.lbCampo.setText("Usuário: campo obrigatório");
+			valido = false;
+		} else if (tfSenha.getText().trim().equals("") || tfCadastrar.getText().trim().equals("")) {
+			TelaMensagemErro frame = new TelaMensagemErro();
+			frame.setUndecorated(true);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			frame.lbCampo.setText("Senha: campo obrigatório");
+			valido = false;
 		}
-		return true;
+		return valido;
 	}
 
-	/**
-	 * Validar senha
-	 */
 	public boolean validarSenha() {
-		String usuario = tfUsuario.getText();
-		String senha = tfSenha.getText();
-		String confirmar = tfConfirmar.getText();
-		
-		if (confirmar.equals(senha)) {
+		if (tfSenha.getText().trim().equals(tfCadastrar.getText())) {
 			return true;
 		}
+		TelaMensagemErro frame = new TelaMensagemErro();
+		frame.setUndecorated(true);
+		frame.setVisible(true);
+		frame.setLocationRelativeTo(null);
+		frame.lbCampo.setText("Senhas não conferem!");
 		return false;
 	}
-	/**
-	 * Método para cadastrar um novo usuario
-	 */
-	public void inserirUsuario() {
-		String usuario = tfUsuario.getText();
-		String senha = tfSenha.getText();
-		String confirmar = tfConfirmar.getText();
 
-			if (b.getConnection() == true) {
+	public void inserir() {
+		if (validarSenha()) {
+			if (getConnection() == true) {
 				try {
-					String sql = "INSERT INTO USUARIO VALUES ('" + usuario + "', '" + senha + "')";
-					b.st = b.con.createStatement();
-					b.st.executeUpdate(sql);
-					JOptionPane.showMessageDialog(null, "Usuario cadastrado com sucesso!", "MESSAGE",
-							JOptionPane.INFORMATION_MESSAGE);
+					String sql = "INSERT INTO USUARIO VALUES ('" + tfUsuario.getText() + "', '" + tfSenha.getText()
+							+ "' , '" + cbPermissao.getSelectedItem() + "')";
+					st = con.createStatement();
+					st.executeUpdate(sql);
+					TelaMensagemAviso frame = new TelaMensagemAviso();
+					frame.setUndecorated(true);
+					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
+					TelaCadastrar t = new TelaCadastrar();
+					t.setVisible(false);
 				} catch (Exception erro) {
-					System.out.println("ERRO" + erro.toString());
+					JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
 				}
+			} else {
+				JOptionPane.showMessageDialog(null, "Falha na conexão");
 			}
-	
+		}
 	}
 
-	
-	/**
-	 * Construtor para o Login
-	 * @param tfUsuario
-	 * @param tfSenha
-	 */
 	public UsuarioController(JTextField tfUsuario, JTextField tfSenha) {
 		super();
 		this.tfUsuario = tfUsuario;
 		this.tfSenha = tfSenha;
 	}
 
-	/**
-	 * Logar no sistema
-	 */
-	public boolean acesso() {
-		boolean valido = false;
-		String usuario = tfUsuario.getText();
-		String senha = tfSenha.getText();
-		if (b.getConnection()) {
+	public boolean validarAcesso() {
+		if (getConnection() == true) {
 			try {
-				String sql = "SELECT * FROM USUARIO WHERE USUARIO LIKE '" + usuario + "' AND SENHA LIKE '" + senha
-						+ "'";
-				b.st = b.con.createStatement();
-				b.rs = b.st.executeQuery(sql);
-				if (b.rs.next()) {
-					valido = true;
+				String sql = "SELECT * FROM USUARIO WHERE USUARIO LIKE '" + tfUsuario.getText() + "' AND SENHA LIKE '"
+						+ tfSenha.getText() + "'";
+				st = con.createStatement();
+				rs = st.executeQuery(sql);
+				if (rs.next()) {
+					permissao = rs.getString("PERMISSAO");
+					return true;
 				}
 			} catch (Exception erro) {
-				System.out.println("ERRO" + erro.toString());
+				JOptionPane.showMessageDialog(null, "ERRO" + erro.toString());
 			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Falha na conexão");
 		}
-		return valido;
-
+		TelaMensagemAviso frame = new TelaMensagemAviso();
+		frame.setUndecorated(true);
+		frame.setVisible(true);
+		frame.setLocationRelativeTo(null);
+		frame.lbTitulo.setText("Usuário e/ou senha inválidos!");
+		return false;
 	}
-	
-	public void verificarSenha() {
-		if(tfConfirmar.getText().equals(tfSenha.getText())) {
-			lblConfirmarSenhaImg.setIcon(new ImageIcon(TelaCadastro.class.getResource("/view/senha_Check3.png")));
-		}
-		else {
-			lblConfirmarSenhaImg.setIcon(new ImageIcon(TelaCadastro.class.getResource("/view/senha_Wrong1.png")));
+
+	public void logar() {
+		validarAcesso();
+		if (validarAcesso()) {
+			if (permissao.equals("Gerente")) {
+				TelaSistema frame = new TelaSistema();
+				frame.setUndecorated(true);
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+				frame.setDefaultCloseOperation(
+						frame.EXIT_ON_CLOSE);
+				frame.pMenu.add(frame.btCaixa);
+				frame.pMenu.add(frame.btCadastrar);
+				frame.pMenu.add(frame.btFluxo);
+				frame.pMenu.add(frame.btListaCargo);
+				frame.pMenu.add(frame.btListaCliente);
+				frame.pMenu.add(frame.btListaConta);
+				frame.pMenu.add(frame.btListaFuncionario);
+				frame.pMenu.add(frame.btListaServico);
+				frame.pMenu.add(frame.btCliente);
+				frame.pMenu.add(frame.btReceber);
+				frame.pMenu.add(frame.btConta);
+				frame.lbUsuario.setText(tfUsuario.getText());
+			} else if (permissao.equals("Administrador")) {
+				TelaSistema frame = new TelaSistema();
+				frame.setUndecorated(true);
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+				frame.setDefaultCloseOperation(
+						frame.EXIT_ON_CLOSE);
+				frame.pMenu.add(frame.btCaixa);
+				frame.pMenu.add(frame.btFluxo);
+				frame.pMenu.add(frame.btListaCliente);
+				frame.pMenu.add(frame.btListaConta);
+				frame.pMenu.add(frame.btListaServico);
+				frame.pMenu.add(frame.btCliente);
+				frame.pMenu.add(frame.btReceber);
+				frame.pMenu.add(frame.btConta);
+				frame.lbUsuario.setText(tfUsuario.getText());
+			} else {
+				TelaSistema frame = new TelaSistema();
+				frame.setDefaultCloseOperation(
+						frame.EXIT_ON_CLOSE);
+				frame.setUndecorated(true);
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+				frame.lbUsuario.setText(tfUsuario.getText());
+			}
 		}
 	}
 
